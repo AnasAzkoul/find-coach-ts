@@ -13,7 +13,6 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -27,12 +26,14 @@ import {
 
 const formSchema = toTypedSchema(UserFormSchema);
 
-const form = useForm({
+const { handleSubmit, handleReset } = useForm({
   validationSchema: formSchema,
 });
 
-const onSubmit = form.handleSubmit((values) => {
-  console.log("Form submitted!", values);
+const onSubmit = handleSubmit((data) => {
+  console.log("submitted the form", data);
+
+  handleReset();
 });
 </script>
 
@@ -91,30 +92,40 @@ const onSubmit = form.handleSubmit((values) => {
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="confirmPassword">
-          <FormItem>
-            <FormLabel>
-              Would you like to register as a student or a coach
-            </FormLabel>
+        <FormField
+          v-slot="{ componentField }"
+          type="radio"
+          name="userType"
+        >
+          <FormItem class="space-y-3">
+            <FormLabel>What would you like to register as?</FormLabel>
+
             <FormControl>
-              <RadioGroup v-bind="componentField" default-value="student">
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem id="r1" value="student" />
-                  <Label for="r1">Student</Label>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <RadioGroupItem id="r2" value="coach" />
-                  <Label for="r2">Coach</Label>
-                </div>
+              <RadioGroup
+                class="flex flex-col space-y-1"
+                v-bind="componentField"
+              >
+                <FormItem class="flex items-center space-y-0 gap-x-3">
+                  <FormControl>
+                    <RadioGroupItem value="student" />
+                  </FormControl>
+                  <FormLabel class="font-normal"> student </FormLabel>
+                </FormItem>
+                <FormItem class="flex items-center space-y-0 gap-x-3">
+                  <FormControl>
+                    <RadioGroupItem value="coach" />
+                  </FormControl>
+                  <FormLabel class="font-normal"> coach </FormLabel>
+                </FormItem>
               </RadioGroup>
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
+        <div class="mt-4">
+          <Button>Sign up</Button>
+        </div>
       </form>
-      <div class="mt-4">
-        <Button type="submit">Sign up</Button>
-      </div>
     </CardContent>
   </Card>
 </template>
