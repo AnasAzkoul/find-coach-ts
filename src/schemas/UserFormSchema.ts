@@ -7,3 +7,5 @@ export const UserFormSchema = UserDataTypesSchema.extend({
   message: "passwords do not match",
   path: ["confirmPassword"],
 });
+
+export type UserFormSchemaTypes = z.infer<typeof UserFormSchema>;

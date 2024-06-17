@@ -1,9 +1,11 @@
 import { z } from "zod";
 
-export const TagSchema = z.object({
-  id: z.string().uuid(),
-  title: z.string(),
-});
+// export const TagSchema = z.object({
+//   id: z.string().uuid(),
+//   title: z.string(),
+// });
+
+export const TagSchema = z.string().toLowerCase().trim()
 
 export const UserDataTypesSchema = z.object({
   firstName: z.string().min(4),
@@ -12,7 +14,7 @@ export const UserDataTypesSchema = z.object({
   password: z
     .string()
     .min(8, "password must be at least 8 characters long"),
-  // tags: z.array(TagSchema),
+  tags: z.array(TagSchema),
   // rate: z.string().transform((value: string): number => {
   //   const transformValue = parseFloat(value);
 
