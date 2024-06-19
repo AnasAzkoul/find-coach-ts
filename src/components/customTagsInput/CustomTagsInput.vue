@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits, watch } from "vue";
+import { ref } from "vue";
 import {
   TagsInput,
   TagsInputInput,
@@ -15,27 +15,22 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-const modelValue = ref<string[]>([]);
+const model = defineModel<string[]>();
 
-const emit = defineEmits(["tags-change"]);
+defineEmits(["delete-tag"]);
 
-watch(modelValue, () => {
-  emit("tags-change", modelValue.value);
-});
-
-function addTag(event: Event) {
+function handleAddTag(event: Event) {
   const input = event.target as HTMLInputElement;
   const newTag = input.value.trim().toLowerCase();
-  if (newTag && !modelValue.value.includes(newTag)) {
-    modelValue.value.push(newTag);
+  if (newTag && !model.value?.includes(newTag)) {
+    model.value = [...(model.value as string[]), newTag];
     input.value = "";
   }
-  emit("tags-change", modelValue.value);
 }
 
 function handleDeleteTag(item: string) {
-  modelValue.value = modelValue.value.filter((tag) => tag !== item);
-  console.log(modelValue.value);
+  model.value = model.value?.filter((tag) => tag !== item);
+  console.log(model.value);
 }
 </script>
 
@@ -44,19 +39,15 @@ function handleDeleteTag(item: string) {
     <FormItem>
       <FormLabel> Areas of expertise / technologies to learn </FormLabel>
       <FormControl>
-        <TagsInput v-model="modelValue">
-          <TagsInputItem
-            v-for="item in modelValue"
-            :key="item"
-            :value="item"
-          >
+        <TagsInput v-model="model">
+          <TagsInputItem v-for="item in model" :key="item" :value="item">
             <TagsInputItemText />
             <TagsInputItemDelete @delete-tag="handleDeleteTag(item)" />
           </TagsInputItem>
 
           <TagsInputInput
             placeholder="technologies..."
-            @keydown.enter.prevent="addTag"
+            @keydown.enter.prevent="handleAddTag"
           />
         </TagsInput>
       </FormControl>

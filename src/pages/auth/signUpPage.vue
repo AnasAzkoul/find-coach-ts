@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { UserFormSchema } from "@/schemas";
+// components
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
@@ -16,9 +17,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+const tags = ref<string[]>([]);
+
+watch(tags, () => {
+  console.log("watching", tags.value);
+  form.setFieldValue("tags", tags.value);
+});
+
 const formSchema = toTypedSchema(UserFormSchema);
 
-defineEmits(["delete-tag"]);
+defineEmits(["delete-tag", "add-tag"]);
 
 const form = useForm({
   validationSchema: formSchema,
@@ -28,12 +36,14 @@ const onSubmit = form.handleSubmit((data) => {
   console.log("submitted the form", data);
 
   form.handleReset();
+  tags.value = [];
+  console.log(tags.value);
 });
 
-function handleTagsChange(tags: string[]) {
-  console.log("listening to event.....", tags);
-  form.setFieldValue("tags", tags);
-}
+// function handleTagsChange(tags: string[]) {
+//   console.log("listening to event.....", tags);
+//   form.setFieldValue("tags", tags);
+// }
 </script>
 
 <template>
@@ -125,7 +135,7 @@ function handleTagsChange(tags: string[]) {
           </FormItem>
         </FormField>
         <!-- ------------------------------------------------------------- -->
-        <CustomerTagsInput @tags-change="handleTagsChange" />
+        <CustomerTagsInput v-model="tags" />
         <!-- ------------------------------------------------------------- -->
         <div class="mt-4 text-center col-span-2">
           <Button size="lg" class="w-full"> Sign up </Button>
