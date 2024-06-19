@@ -7,7 +7,7 @@ import { UserFormSchema } from "@/schemas";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import CustomerTagsInput from "@/components/customTagsInput/CustomTagsInput.vue";
+import CustomTagsInput from "@/components/customTagsInput/CustomTagsInput.vue";
 import CustomCard from "@/components/customCard/CustomCard.vue";
 import {
   FormControl,
@@ -16,6 +16,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+
+import { useAuthStore } from "@/stores/authStore";
 
 const tags = ref<string[]>([]);
 
@@ -32,18 +34,17 @@ const form = useForm({
   validationSchema: formSchema,
 });
 
+const authStore = useAuthStore();
+
 const onSubmit = form.handleSubmit((data) => {
   console.log("submitted the form", data);
+
+  authStore.createUser(data);
 
   form.handleReset();
   tags.value = [];
   console.log(tags.value);
 });
-
-// function handleTagsChange(tags: string[]) {
-//   console.log("listening to event.....", tags);
-//   form.setFieldValue("tags", tags);
-// }
 </script>
 
 <template>
@@ -135,7 +136,7 @@ const onSubmit = form.handleSubmit((data) => {
           </FormItem>
         </FormField>
         <!-- ------------------------------------------------------------- -->
-        <CustomerTagsInput v-model="tags" />
+        <CustomTagsInput v-model="tags" />
         <!-- ------------------------------------------------------------- -->
         <div class="mt-4 text-center col-span-2">
           <Button size="lg" class="w-full"> Sign up </Button>
