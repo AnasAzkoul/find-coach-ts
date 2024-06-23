@@ -9,6 +9,8 @@ import {
 import { auth } from "@/firebase/auth.ts";
 import { UserDataTypes } from "@/types";
 
+import {addNewUser} from "@/firebase"
+
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<User | null>(auth.currentUser);
 
@@ -22,9 +24,19 @@ export const useAuthStore = defineStore("auth", () => {
         password,
       );
 
+      if(newUser.user !== null) {
+        const userData = {
+
+        }
+
+
+        const response = await addNewUser(data); 
+        console.log(response); 
+      }
+
       user.value = newUser.user;
 
-      console.log(newUser);
+      console.dir(newUser);
     } catch (error) {
       error instanceof Error && console.log(error.message);
     }

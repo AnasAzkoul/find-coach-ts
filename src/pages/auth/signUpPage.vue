@@ -2,7 +2,7 @@
 import { ref, watch } from "vue";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
-import { UserFormSchema } from "@/schemas";
+import { NewUserFormSchema } from "@/schemas";
 // components
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -26,7 +26,7 @@ watch(tags, () => {
   form.setFieldValue("tags", tags.value);
 });
 
-const formSchema = toTypedSchema(UserFormSchema);
+const formSchema = toTypedSchema(NewUserFormSchema);
 
 defineEmits(["delete-tag", "add-tag"]);
 
