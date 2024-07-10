@@ -2,41 +2,60 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, 
+  signInWithEmailAndPassword,
   type UserCredential,
   type User,
 } from "firebase/auth";
-import { auth } from "@/firebase/auth.ts";
-import { UserDataTypes } from "@/types";
 
-import {addNewUser} from "@/firebase"
+import Cookies from "js-cookie";
+
+import { auth } from "@/firebase/auth.ts";
+
+import {
+  type NewUserFormSchemaTypes,
+  type NewUserDataTypes,
+  type AuthenticatedUser,
+} from "@/types";
+
+import { addNewUserToDB, getUserWithAuthID } from "@/firebase";
 
 export const useAuthStore = defineStore("auth", () => {
-  const user = ref<User | null>(auth.currentUser);
+  const user = ref<NewUserDataTypes | null>(null);
 
-  async function createUser(data: UserDataTypes) {
+  async function createUser(data: NewUserFormSchemaTypes) {
     const { email, password } = data;
 
     try {
-      const newUser = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
+      const { user: authenticatedUser } =
+        await createUserWithEmailAndPassword(auth, email, password);
 
-      if(newUser.user !== null) {
-        const userData = {
+      const userToken = await authenticatedUser.getIdToken();
 
-        }
-
-
-        const response = await addNewUser(data); 
-        console.log(response); 
+      if (user === null) {
+        throw new Error("There was problem authenticating you....");
       }
 
-      user.value = newUser.user;
+      Cookies.set("user-log-in", userToken);
 
-      console.dir(newUser);
+      const userData: NewUserDataTypes = {
+        authId: authenticatedUser.uid,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        tags: data.tags,
+        userType: data.userType,
+        emailVerified: authenticatedUser.emailVerified,
+        photoURL: authenticatedUser.photoURL,
+        displayName: authenticatedUser.displayName,
+      };
+
+      await addNewUserToDB(userData);
+
+      const userFromDB = await getUserWithAuthID(authenticatedUser.uid);
+
+      user.value = userFromDB as NewUserDataTypes;
+
+      console.log(user.value);
     } catch (error) {
       error instanceof Error && console.log(error.message);
     }
